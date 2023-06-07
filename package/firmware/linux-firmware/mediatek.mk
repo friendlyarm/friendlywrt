@@ -135,3 +135,15 @@ define Package/mt7988-wo-firmware/install
 		$(1)/lib/firmware/mediatek/mt7988
 endef
 $(eval $(call BuildPackage,mt7988-wo-firmware))
+
+Package/mt792x-firmware = $(call Package/firmware-default,MediaTek MT792x firmware)
+define Package/mt792x-firmware/install
+	$(INSTALL_DIR) $(1)/lib/firmware/mediatek
+	$(INSTALL_DATA) \
+		$(PKG_BUILD_DIR)/mediatek/WIFI_MT7922_patch_mcu_1_1_hdr.bin \
+		$(PKG_BUILD_DIR)/mediatek/WIFI_RAM_CODE_MT7922_1.bin \
+		$(PKG_BUILD_DIR)/mediatek/WIFI_MT7961_patch_mcu_1_2_hdr.bin \
+		$(PKG_BUILD_DIR)/mediatek/WIFI_RAM_CODE_MT7961_1.bin \
+		$(1)/lib/firmware/mediatek
+endef
+$(eval $(call BuildPackage,mt792x-firmware))
