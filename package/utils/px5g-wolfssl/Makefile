@@ -22,6 +22,7 @@ define Package/px5g-wolfssl
   SUBMENU:=Encryption
   TITLE:=X.509 certificate generator (using WolfSSL)
   DEPENDS:=+libwolfssl
+  DEFAULT:=n if PACKAGE_px5g-mbedtls
   PROVIDES:=px5g
   VARIANT:=wolfssl
 endef
