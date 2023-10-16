@@ -26,6 +26,7 @@ define Package/openssl/add-module
   $(eval MOD_TYPE:=$(1))
   $(eval MOD_NAME:=$(2))
   $(eval MOD_DIR:=$(3))
+  $(eval MOD_ENA:=$(if $(CONFIG_OPENSSL_MODULE_DEFAULT_ON),1,0))
   $(eval OSSL_PKG:=$(if $(4),$(4),libopenssl-$(MOD_NAME)))
   $(info Package/openssl/add-module 1='$(1)'; 2='$(2)'; 3='$(3)' 4='$(4)')
   $(info MOD_TYPE='$(MOD_TYPE)'; MOD_NAME='$(MOD_NAME)'; MOD_DIR='$(MOD_DIR)' OSSL_PKG='$(OSSL_PKG)')
@@ -50,7 +51,7 @@ OPENSSL_UCI="$$$${IPKG_INSTROOT}/etc/config/openssl"
 cat << EOF >> "$$$${OPENSSL_UCI}"
 
 config $(MOD_TYPE) '$(MOD_NAME)'
-	option enabled '1'
+	option enabled '$(MOD_ENA)'
 EOF
 
 [ -n "$$$${IPKG_INSTROOT}" ] || /etc/init.d/openssl reload

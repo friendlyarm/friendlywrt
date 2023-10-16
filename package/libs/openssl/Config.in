@@ -259,6 +259,12 @@ config OPENSSL_ENGINE
 		Note that you need to enable KERNEL_AIO to be able to build the
 		afalg engine package.
 
+config OPENSSL_MODULE_DEFAULT_ON
+	bool
+	default n if TARGET_rockchip
+	prompt "Module config defaults to on"
+	depends on OPENSSL_ENGINE
+
 config OPENSSL_ENGINE_BUILTIN
 	bool "Build chosen engines into libcrypto"
 	depends on OPENSSL_ENGINE
