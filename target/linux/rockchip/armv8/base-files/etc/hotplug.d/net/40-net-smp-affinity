@@ -58,6 +58,12 @@ friendlyelec,nanopi-r2)
 	seconds="0"
 	set_interface_core 8 "wlan0" "36 Level     dw-mci"
 	;;
+friendlyelec,nanopi-r3s)
+	set_interface_core 4 "eth0"
+	echo b > /sys/class/net/eth0/queues/rx-0/rps_cpus
+	set_interface_core 2 "eth1"
+	echo d > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	;;
 friendlyarm,nanopi-r4s|\
 friendlyelec,nanopi-r4s)
 	set_interface_core 10 "eth0"

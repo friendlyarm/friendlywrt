@@ -15,7 +15,7 @@ rockchip_setup_interfaces()
 	nanopi-r5c | \
 	nanopi-r6c | \
 	nanopc-t6 | \
-	nanopi-r4s)
+	nanopi-r3s)
 		ucidef_set_interface_wan 'eth0'
 		ucidef_set_interface "lan" device  "eth1" protocol "static" ipaddr "192.168.2.1"
 		;;
