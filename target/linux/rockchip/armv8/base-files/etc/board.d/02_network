@@ -23,6 +23,7 @@ rockchip_setup_interfaces()
 	nanopc-t4 | \
 	nanopi-m4 | \
 	nanopi-m6 | \
+	nanopi-zero2 | \
 	nanopi-neo4 | \
 	som-rk3399 | cm3588)
 		ucidef_set_interface_wan 'eth0'
