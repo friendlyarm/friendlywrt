@@ -35,7 +35,7 @@ function init_firewall_ipv6() {
 function init_firewall() {
 	uci set firewall.@defaults[0].input='ACCEPT'
 	uci set firewall.@defaults[0].output='ACCEPT'
-	uci set firewall.@defaults[0].forward='ACCEPT'
+	uci set firewall.@defaults[0].forward='REJECT'
 
 	case "$boardname" in
 	nanopi-r5* | nanopi-r3* | nanopi-r2*)
