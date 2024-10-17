@@ -69,8 +69,12 @@ function init_firewall() {
 }
 
 function init_network() {
-	uci set network.globals.ula_prefix='fd00:ab:cd::/48'
-	uci commit network
+    local r1 r2 r3
+    r1=$(dd if=/dev/urandom bs=1 count=1 | hexdump -e '1/1 "%02x"')
+    r2=$(dd if=/dev/urandom bs=2 count=1 | hexdump -e '2/1 "%02x"')
+    r3=$(dd if=/dev/urandom bs=2 count=1 | hexdump -e '2/1 "%02x"')
+    uci set network.globals.ula_prefix="fd$r1:$r2:$r3::/48"
+    uci commit network
 }
 
 function init_nft_qos() {
