@@ -197,7 +197,17 @@ function init_button() {
 }
 
 function clean_fstab() {
-	while uci -q del fstab.@mount[-1]; do true; done
+	# delete all entries but keep /opt
+	local index=0
+	while uci -q get fstab.@mount[$index]; do
+		local target=$(uci -q get fstab.@mount[$index].target)
+		if [ "$target" = "/opt" ]; then
+			index=$((index + 1))
+		else
+			uci -q del fstab.@mount[$index]
+			# do not increment index because the remaining entries will shift forward after deletion
+		fi
+	done
 	uci commit fstab
 }
 
