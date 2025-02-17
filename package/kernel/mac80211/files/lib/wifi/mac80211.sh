@@ -255,6 +255,7 @@ detect_mac80211() {
 
 		# mt7921 (pcie & usb)
 		"pcie-mt7921e-14C3:7961" | \
+		"pcie-mt7921e-14C3:0608" | \
 		"e8d/7961/100")
 			mode_band='5g'
 			ht_capab="set wireless.${name}.htmode=HE80"
