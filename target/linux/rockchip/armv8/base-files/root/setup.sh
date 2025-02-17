@@ -9,16 +9,14 @@ board=$(board_name)
 boardname="${board##*,}"
 
 function custom_menu() {
-    nas+=("/usr/share/luci/menu.d/luci-app-hd-idle.json")
-    nas+=("/usr/share/luci/menu.d/luci-app-minidlna.json")
-    nas+=("/usr/share/luci/menu.d/luci-app-samba4.json")
-    nas+=("/usr/lib/lua/luci/controller/aria2.lua")
-    for (( i=0; i<${#nas[@]}; i++ ));
-    do
-        if [ -f ${nas[$i]} ]; then
-            sed -i 's/services/nas/g' ${nas[$i]}
-        fi
-    done
+	file="/usr/share/luci/menu.d/luci-app-hd-idle.json"
+	[ -f $file ] && sed -i 's/services/nas/g' $file
+	file="/usr/share/luci/menu.d/luci-app-minidlna.json"
+	[ -f $file ] && sed -i 's/services/nas/g' $file
+	file="/usr/share/luci/menu.d/luci-app-samba4.json"
+	[ -f $file ] && sed -i 's/services/nas/g' $file
+	file="/usr/lib/lua/luci/controller/aria2.lua"
+	[ -f $file ] && sed -i 's/services/nas/g' $file
 }
 
 function init_firewall() {
@@ -59,7 +57,7 @@ function init_network() {
 	uci commit network
 }
 
-function init_nft-qos() {
+function init_nft_qos() {
 	uci set nft-qos.default=default
 	uci set nft-qos.default.limit_enable='0'
 	uci set nft-qos.default.limit_mac_enable='0'
@@ -168,7 +166,17 @@ function init_button() {
 }
 
 function clean_fstab() {
-	while uci -q del fstab.@mount[-1]; do true; done
+	# delete all entries but keep /opt
+	local index=0
+	while uci -q get fstab.@mount[$index]; do
+		local target=$(uci -q get fstab.@mount[$index].target)
+		if [ "$target" = "/opt" ]; then
+			index=$((index + 1))
+		else
+			uci -q del fstab.@mount[$index]
+			# do not increment index because the remaining entries will shift forward after deletion
+		fi
+	done
 	uci commit fstab
 }
 
@@ -191,10 +199,10 @@ function add_static_host() {
 
 HOSTNAME="FriendlyWrt"
 
-if [ "${1,,}" = "all" ]; then
+if [ "$(echo "$1" | tr 'A-Z' 'a-z')" = "all" ]; then
 	custom_menu
 	init_network
-	init_nft-qos
+	init_nft_qos
 	init_firewall
 	init_system
 	init_samba4
@@ -207,4 +215,3 @@ if [ "${1,,}" = "all" ]; then
 	init_button
 	clean_fstab
 fi
-
