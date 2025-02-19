@@ -1,0 +1,36 @@
+From 0a8f1a10393f4950526796b362c1f7ab831ffec4 Mon Sep 17 00:00:00 2001
+From: Jensen Huang <jensenhuang@friendlyarm.com>
+Date: Wed, 19 Feb 2025 14:04:59 +0800
+Subject: [PATCH] Revert "Add DSSS Parameter Set element only for 2.4 GHz"
+
+This reverts commit 8056b79ff1e5 ("Add DSSS Parameter Set element only
+for 2.4 GHz") to restore compatibility with affected drivers, such as
+rtl8822cs, which failto start 5G AP without the DS Params element.
+
+This is a temporary workaround until the affected drivers are updated.
+
+Signed-off-by: Jensen Huang <jensenhuang@friendlyarm.com>
+---
+ src/ap/beacon.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/src/ap/beacon.c b/src/ap/beacon.c
+index d904fa265..c7a5f1f04 100644
+--- a/src/ap/beacon.c
++++ b/src/ap/beacon.c
+@@ -88,12 +88,6 @@ static u8 ieee802_11_erp_info(struct hostapd_data *hapd)
+ 
+ static u8 * hostapd_eid_ds_params(struct hostapd_data *hapd, u8 *eid)
+ {
+-	enum hostapd_hw_mode hw_mode = hapd->iconf->hw_mode;
+-
+-	if (hw_mode != HOSTAPD_MODE_IEEE80211G &&
+-	    hw_mode != HOSTAPD_MODE_IEEE80211B)
+-		return eid;
+-
+ 	*eid++ = WLAN_EID_DS_PARAMS;
+ 	*eid++ = 1;
+ 	*eid++ = hapd->iconf->channel;
+-- 
+2.47.0
+
