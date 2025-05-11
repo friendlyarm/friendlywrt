@@ -67,7 +67,7 @@ $(eval $(call KernelPackage,fs-autofs4))
 define KernelPackage/fs-btrfs
   SUBMENU:=$(FS_MENU)
   TITLE:=BTRFS filesystem support
-  DEPENDS:=+kmod-lib-crc32c +kmod-lib-lzo +kmod-lib-zlib-inflate +kmod-lib-zlib-deflate +kmod-lib-raid6 +kmod-lib-xor +kmod-lib-zstd
+  DEPENDS:=+kmod-lib-crc32c +kmod-lib-lzo +kmod-lib-zlib-inflate +kmod-lib-zlib-deflate +kmod-lib-raid6 +kmod-lib-xor +kmod-lib-zstd +kmod-crypto-blake2b +kmod-crypto-xxhash
   KCONFIG:=\
 	CONFIG_BTRFS_FS \
 	CONFIG_BTRFS_FS_CHECK_INTEGRITY=n
@@ -352,8 +352,7 @@ define KernelPackage/fs-ksmbd
   DEPENDS:= \
 	  +kmod-nls-base \
 	  +kmod-nls-utf8 \
-	  +kmod-crypto-md4 \
-          +kmod-crypto-md5 \
+	  +kmod-crypto-md5 \
 	  +kmod-crypto-hmac \
 	  +kmod-crypto-ecb \
 	  +kmod-crypto-des \

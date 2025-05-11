@@ -2,6 +2,7 @@
 # MT7620A Profiles
 #
 
+include ./common-sercomm.mk
 include ./common-tp-link.mk
 
 DEVICE_VARS += DLINK_ROM_ID DLINK_FAMILY_MEMBER DLINK_FIRMWARE_SIZE DLINK_IMAGE_OFFSET
@@ -223,6 +224,19 @@ define Device/dlink_dir-510l
 endef
 TARGET_DEVICES += dlink_dir-510l
 
+define Device/dlink_dir-806a-b1
+  SOC := mt7620a
+  IMAGE_SIZE := 7872k
+  DEVICE_VENDOR := D-Link
+  DEVICE_MODEL := DIR-806A
+  DEVICE_VARIANT := B1
+  DEVICE_PACKAGES += kmod-mt76x0e
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-kernel | append-rootfs | pad-rootfs | check-size | \
+	sign-dlink-ru cef285a2e29e40b2baab31277d44298b
+endef
+TARGET_DEVICES += dlink_dir-806a-b1
+
 define Device/dlink_dir-810l
   SOC := mt7620a
   DEVICE_PACKAGES := kmod-mt76x0e
@@ -379,6 +393,22 @@ define Device/dovado_tiny-ac
   SUPPORTED_DEVICES += tiny-ac
 endef
 TARGET_DEVICES += dovado_tiny-ac
+
+define Device/edimax_br-6208ac-v2
+  SOC := mt7620a
+  DEVICE_VENDOR := Edimax
+  DEVICE_MODEL := BR-6208AC
+  DEVICE_VARIANT := V2
+  BLOCKSIZE := 64k
+  IMAGE_SIZE := 7744k
+  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | \
+	edimax-header -s CSYS -m RN71 -f 0x70000 -S 0x01100000 | pad-rootfs | \
+	check-size | append-metadata
+  DEVICE_PACKAGES := kmod-mt76x2 kmod-mt76x0e kmod-phy-realtek \
+	kmod-usb2 kmod-usb-ohci kmod-usb-ledtrig-usbport \
+	uboot-envtools
+endef
+TARGET_DEVICES += edimax_br-6208ac-v2
 
 define Device/edimax_br-6478ac-v2
   SOC := mt7620a
@@ -1070,6 +1100,27 @@ define Device/ravpower_rp-wd03
 	Upgrade via sysupgrade mechanism is not possible, so new installation via TFTP is required.
 endef
 TARGET_DEVICES += ravpower_rp-wd03
+
+define Device/rostelecom_rt-fl-1
+  $(Device/sercomm_cpj)
+  DEVICE_MODEL := RT-FL-1
+  DEVICE_ALT0_MODEL := RT-FL-1
+  ARTIFACT/initramfs-factory.img := \
+	append-image-stage initramfs-kernel.bin | check-size | \
+	sercomm-factory-cpj | gzip | sercomm-payload | \
+	sercomm-pid-setbit 0x11 | sercomm-crypto
+endef
+TARGET_DEVICES += rostelecom_rt-fl-1
+
+define Device/rostelecom_s1010
+  $(Device/sercomm_cpj)
+  DEVICE_MODEL := S1010
+  DEVICE_ALT0_MODEL := S1010.RT
+  ARTIFACT/initramfs-factory.img := \
+	append-image-stage initramfs-kernel.bin | check-size | \
+	sercomm-factory-cpj | gzip | sercomm-payload | sercomm-crypto
+endef
+TARGET_DEVICES += rostelecom_s1010
 
 define Device/sanlinking_d240
   SOC := mt7620a

@@ -30,6 +30,17 @@ Signed-off-by: Gabor Juhos <j4g8y7@gmail.com>
        - qsgmii
        - tbi
        - rev-mii
+--- a/drivers/net/phy/phy-core.c
++++ b/drivers/net/phy/phy-core.c
+@@ -140,6 +140,8 @@ int phy_interface_num_ports(phy_interfac
+ 	case PHY_INTERFACE_MODE_QSGMII:
+ 	case PHY_INTERFACE_MODE_QUSGMII:
+ 		return 4;
++	case PHY_INTERFACE_MODE_PSGMII:
++		return 5;
+ 	case PHY_INTERFACE_MODE_MAX:
+ 		WARN_ONCE(1, "PHY_INTERFACE_MODE_MAX isn't a valid interface mode");
+ 		return 0;
 --- a/drivers/net/phy/phylink.c
 +++ b/drivers/net/phy/phylink.c
 @@ -371,6 +371,7 @@ void phylink_get_linkmodes(unsigned long
@@ -38,19 +49,19 @@ Signed-off-by: Gabor Juhos <j4g8y7@gmail.com>
  	case PHY_INTERFACE_MODE_RGMII:
 +	case PHY_INTERFACE_MODE_PSGMII:
  	case PHY_INTERFACE_MODE_QSGMII:
+ 	case PHY_INTERFACE_MODE_QUSGMII:
  	case PHY_INTERFACE_MODE_SGMII:
- 	case PHY_INTERFACE_MODE_GMII:
-@@ -634,6 +635,7 @@ static int phylink_parse_mode(struct phy
+@@ -636,6 +637,7 @@ static int phylink_parse_mode(struct phy
  
  		switch (pl->link_config.interface) {
  		case PHY_INTERFACE_MODE_SGMII:
 +		case PHY_INTERFACE_MODE_PSGMII:
  		case PHY_INTERFACE_MODE_QSGMII:
+ 		case PHY_INTERFACE_MODE_QUSGMII:
  			phylink_set(pl->supported, 10baseT_Half);
- 			phylink_set(pl->supported, 10baseT_Full);
 --- a/include/linux/phy.h
 +++ b/include/linux/phy.h
-@@ -139,6 +139,7 @@ typedef enum {
+@@ -141,6 +141,7 @@ typedef enum {
  	PHY_INTERFACE_MODE_XGMII,
  	PHY_INTERFACE_MODE_XLGMII,
  	PHY_INTERFACE_MODE_MOCA,
@@ -58,7 +69,7 @@ Signed-off-by: Gabor Juhos <j4g8y7@gmail.com>
  	PHY_INTERFACE_MODE_QSGMII,
  	PHY_INTERFACE_MODE_TRGMII,
  	PHY_INTERFACE_MODE_100BASEX,
-@@ -244,6 +245,8 @@ static inline const char *phy_modes(phy_
+@@ -248,6 +249,8 @@ static inline const char *phy_modes(phy_
  		return "xlgmii";
  	case PHY_INTERFACE_MODE_MOCA:
  		return "moca";

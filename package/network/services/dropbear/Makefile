@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dropbear
 PKG_VERSION:=2022.82
-PKG_RELEASE:=5
+PKG_RELEASE:=6
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:= \
@@ -19,7 +19,7 @@ PKG_HASH:=3a038d2bbc02bf28bbdd20c012091f741a3ec5cbe460691811d714876aad75d1
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE libtomcrypt/LICENSE libtommath/LICENSE
-PKG_CPE_ID:=cpe:/a:matt_johnston:dropbear_ssh_server
+PKG_CPE_ID:=cpe:/a:dropbear_ssh_project:dropbear_ssh
 
 PKG_BUILD_PARALLEL:=1
 PKG_ASLR_PIE_REGULAR:=1

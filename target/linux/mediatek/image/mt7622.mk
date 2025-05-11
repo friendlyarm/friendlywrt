@@ -6,19 +6,24 @@ define Image/Prepare
 	echo -ne '\xde\xad\xc0\xde' > $(KDIR)/ubi_mark
 endef
 
-define Build/buffalo-kernel-trx
+define Build/buffalo-trx
 	$(eval magic=$(word 1,$(1)))
-	$(eval dummy=$(word 2,$(1)))
+	$(eval kern_bin=$(if $(1),$(IMAGE_KERNEL),$@))
+	$(eval rtfs_bin=$(word 2,$(1)))
+	$(eval apnd_bin=$(word 3,$(1)))
 	$(eval kern_size=$(if $(KERNEL_SIZE),$(KERNEL_SIZE),0x400000))
 
-	$(if $(dummy),touch $(dummy))
+	$(if $(rtfs_bin),touch $(rtfs_bin))
 	$(STAGING_DIR_HOST)/bin/otrx create $@.new \
 		$(if $(magic),-M $(magic),) \
-		-f $@ \
-		$(if $(dummy),\
+		-f $(kern_bin) \
+		$(if $(rtfs_bin),\
 			-a 0x20000 \
 			-b $$(( $(subst k, * 1024,$(kern_size)) )) \
-			-f $(dummy),)
+			-f $(rtfs_bin),) \
+		$(if $(apnd_bin),\
+			-A $(apnd_bin) \
+			-a 0x20000)
 	mv $@.new $@
 endef
 
@@ -28,6 +33,21 @@ endef
 
 define Build/bl31-uboot
 	cat $(STAGING_DIR_IMAGE)/mt7622_$1-u-boot.fip >> $@
+endef
+
+define Build/uboot-bin
+	cat $(STAGING_DIR_IMAGE)/mt7622_$1-u-boot.bin >> $@
+endef
+
+define Build/uboot-fit
+	$(TOPDIR)/scripts/mkits.sh \
+		-D $(DEVICE_NAME) -o $@.its -k $@ \
+		-C $(word 1,$(1)) \
+		-a 0x41e00000 -e 0x41e00000 \
+		-c "config-1" \
+		-A $(LINUX_KARCH) -v u-boot
+	PATH=$(LINUX_DIR)/scripts/dtc:$(PATH) mkimage -f $@.its $@.new
+	@mv $@.new $@
 endef
 
 define Build/mt7622-gpt
@@ -49,19 +69,6 @@ define Build/mt7622-gpt
 		)
 	cat $@.tmp >> $@
 	rm $@.tmp
-endef
-
-define Build/trx-nand
-	# kernel: always use 4 MiB (-28 B or TRX header) to allow upgrades even
-	#	  if it grows up between releases
-	# root: UBI with one extra block containing UBI mark to trigger erasing
-	#	rest of partition
-	$(STAGING_DIR_HOST)/bin/otrx create $@.new \
-		-M 0x32504844 \
-		-f $(IMAGE_KERNEL) -a 0x20000 -b 0x400000 \
-		-f $@ \
-		-A $(KDIR)/ubi_mark -a 0x20000
-	mv $@.new $@
 endef
 
 define Device/bananapi_bpi-r64
@@ -122,17 +129,81 @@ define Device/buffalo_wsr-2533dhp2
   IMAGES += factory.bin factory-uboot.bin
   KERNEL_INITRAMFS := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | \
-	buffalo-kernel-trx
-  IMAGE/factory.bin := append-ubi | trx-nand | \
+	buffalo-trx
+  IMAGE/factory.bin := append-ubi | \
+	buffalo-trx 0x32504844 $$$$@ $(KDIR)/ubi_mark | \
 	buffalo-enc WSR-2533DHP2 $$(BUFFALO_TAG_VERSION) -l | \
 	buffalo-tag-dhp WSR-2533DHP2 JP JP | buffalo-enc-tag -l | buffalo-dhp-image
-  IMAGE/factory-uboot.bin := append-ubi | trx-nand
-  IMAGE/sysupgrade.bin := append-kernel | \
-	buffalo-kernel-trx 0x32504844 $(KDIR)/tmp/$$(DEVICE_NAME).null | \
+  IMAGE/factory-uboot.bin := append-ubi | \
+	buffalo-trx 0x32504844 $$$$@ $(KDIR)/ubi_mark
+  IMAGE/sysupgrade.bin := \
+	buffalo-trx 0x32504844 $(KDIR)/tmp/$$(DEVICE_NAME).null | \
 	sysupgrade-tar kernel=$$$$@ | append-metadata
   DEVICE_PACKAGES := kmod-mt7615-firmware swconfig
 endef
 TARGET_DEVICES += buffalo_wsr-2533dhp2
+
+define Device/buffalo_wsr-3200ax4s
+  DEVICE_VENDOR := Buffalo
+  DEVICE_MODEL := WSR-3200AX4S
+  DEVICE_DTS := mt7622-buffalo-wsr-3200ax4s
+  IMAGE_SIZE := 24576k
+  BUFFALO_TRX_MAGIC := 0x33504844
+  DEVICE_PACKAGES := kmod-mt7915-firmware
+  DEVICE_DTS_DIR := ../dts
+  KERNEL_SIZE := 6144k
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  UBINIZE_OPTS := -E 5
+  BUFFALO_TAG_PLATFORM := MTK
+  BUFFALO_TAG_VERSION := 9.99
+  BUFFALO_TAG_MINOR := 9.99
+  IMAGES += factory.bin factory-uboot.bin
+  KERNEL_INITRAMFS = kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | \
+	buffalo-trx
+  IMAGE/factory.bin = append-ubi | \
+	buffalo-trx $$$$(BUFFALO_TRX_MAGIC) $$$$@ $(KDIR)/ubi_mark | \
+	buffalo-enc $$(DEVICE_MODEL) $$(BUFFALO_TAG_VERSION) -l | \
+	buffalo-tag-dhp $$(DEVICE_MODEL) JP JP | buffalo-enc-tag -l | buffalo-dhp-image
+  IMAGE/factory-uboot.bin := append-ubi | \
+	buffalo-trx $$$$(BUFFALO_TRX_MAGIC) $$$$@ $(KDIR)/ubi_mark
+  IMAGE/sysupgrade.bin := \
+	buffalo-trx $$$$(BUFFALO_TRX_MAGIC) $(KDIR)/tmp/$$(DEVICE_NAME).null | \
+	sysupgrade-tar kernel=$$$$@ | append-metadata
+endef
+TARGET_DEVICES += buffalo_wsr-3200ax4s
+
+define Device/dlink_eagle-pro-ai-ax3200-a1
+  IMAGE_SIZE := 46080k
+  DEVICE_VENDOR := D-Link
+  DEVICE_VARIANT := A1
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7915-firmware
+  KERNEL_SIZE := 8192k
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  UBINIZE_OPTS := -E 5
+  IMAGES += tftp.bin recovery.bin
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  IMAGE/tftp.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | check-size
+endef
+
+define Device/dlink_eagle-pro-ai-m32-a1
+  $(Device/dlink_eagle-pro-ai-ax3200-a1)
+  DEVICE_MODEL := EAGLE PRO AI M32
+  DEVICE_DTS := mt7622-dlink-eagle-pro-ai-m32-a1
+  IMAGE/recovery.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | pad-to $$(IMAGE_SIZE) | dlink-ai-recovery-header DLK6E6010001 \x8D\x57\x30\x0B \x00\x00\x2C\x00 \x00\x00\xD0\x02 \x60\x6E
+endef
+TARGET_DEVICES += dlink_eagle-pro-ai-m32-a1
+
+define Device/dlink_eagle-pro-ai-r32-a1
+  $(Device/dlink_eagle-pro-ai-ax3200-a1)
+  DEVICE_MODEL := EAGLE PRO AI R32
+  DEVICE_DTS := mt7622-dlink-eagle-pro-ai-r32-a1
+  IMAGE/recovery.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | pad-to $$(IMAGE_SIZE) | dlink-ai-recovery-header DLK6E6015001 \x8D\x57\x30\x0B \x00\x00\x2C\x00 \x00\x00\xD0\x02 \x60\x6E
+endef
+TARGET_DEVICES += dlink_eagle-pro-ai-r32-a1
 
 define Device/elecom_wrc-2533gent
   DEVICE_VENDOR := Elecom
@@ -286,7 +357,7 @@ TARGET_DEVICES += totolink_a8000ru
 
 define Device/ubnt_unifi-6-lr-v1
   DEVICE_VENDOR := Ubiquiti
-  DEVICE_MODEL := UniFi 6 LR
+  DEVICE_MODEL := UniFi U6 Long-Range
   DEVICE_VARIANT := v1
   DEVICE_DTS_CONFIG := config@1
   DEVICE_DTS := mt7622-ubnt-unifi-6-lr-v1
@@ -298,7 +369,7 @@ TARGET_DEVICES += ubnt_unifi-6-lr-v1
 
 define Device/ubnt_unifi-6-lr-v1-ubootmod
   DEVICE_VENDOR := Ubiquiti
-  DEVICE_MODEL := UniFi 6 LR
+  DEVICE_MODEL := UniFi U6 Long-Range
   DEVICE_VARIANT := v1 U-Boot mod
   DEVICE_DTS := mt7622-ubnt-unifi-6-lr-v1-ubootmod
   DEVICE_DTS_DIR := ../dts
@@ -317,7 +388,7 @@ TARGET_DEVICES += ubnt_unifi-6-lr-v1-ubootmod
 
 define Device/ubnt_unifi-6-lr-v2
   DEVICE_VENDOR := Ubiquiti
-  DEVICE_MODEL := UniFi 6 LR
+  DEVICE_MODEL := UniFi U6 Long-Range
   DEVICE_VARIANT := v2
   DEVICE_DTS_CONFIG := config@1
   DEVICE_DTS := mt7622-ubnt-unifi-6-lr-v2
@@ -328,7 +399,7 @@ TARGET_DEVICES += ubnt_unifi-6-lr-v2
 
 define Device/ubnt_unifi-6-lr-v2-ubootmod
   DEVICE_VENDOR := Ubiquiti
-  DEVICE_MODEL := UniFi 6 LR
+  DEVICE_MODEL := UniFi U6 Long-Range
   DEVICE_VARIANT := v2 U-Boot mod
   DEVICE_DTS := mt7622-ubnt-unifi-6-lr-v2-ubootmod
   DEVICE_DTS_DIR := ../dts
@@ -346,7 +417,7 @@ TARGET_DEVICES += ubnt_unifi-6-lr-v2-ubootmod
 
 define Device/ubnt_unifi-6-lr-v3
   DEVICE_VENDOR := Ubiquiti
-  DEVICE_MODEL := UniFi 6 LR
+  DEVICE_MODEL := UniFi U6 Long-Range
   DEVICE_VARIANT := v3
   DEVICE_DTS_CONFIG := config@1
   DEVICE_DTS := mt7622-ubnt-unifi-6-lr-v3
@@ -357,7 +428,7 @@ TARGET_DEVICES += ubnt_unifi-6-lr-v3
 
 define Device/ubnt_unifi-6-lr-v3-ubootmod
   DEVICE_VENDOR := Ubiquiti
-  DEVICE_MODEL := UniFi 6 LR
+  DEVICE_MODEL := UniFi U6 Long-Range
   DEVICE_VARIANT := v3 U-Boot mod
   DEVICE_DTS := mt7622-ubnt-unifi-6-lr-v3-ubootmod
   DEVICE_DTS_DIR := ../dts

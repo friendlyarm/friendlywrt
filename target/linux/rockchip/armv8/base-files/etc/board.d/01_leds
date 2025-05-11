@@ -13,6 +13,7 @@ nanopi-r2s)
 	ucidef_set_led_netdev "lan" "LAN" "$boardname:green:lan" "eth1"
 	;;
 nanopi-r2 | \
+nanopi-r3s| \
 nanopi-r4s)
 	ucidef_set_led_netdev "wan" "WAN" "wan_led" "eth0"
 	ucidef_set_led_netdev "lan" "LAN" "lan_led" "eth1"

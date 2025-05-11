@@ -45,6 +45,13 @@ case "$board" in
 		[ "$PHYNBR" = "1" ] && \
 			macaddr_add $lan_mac_addr 2 > /sys${DEVPATH}/macaddress
 		;;
+	dlink,covr-x1860-a1)
+		label_mac=$(mtd_get_mac_ascii config2 factory_mac)
+		[ "$PHYNBR" = "0" ] && \
+			macaddr_add $label_mac 1 > /sys${DEVPATH}/macaddress
+		[ "$PHYNBR" = "1" ] && \
+			macaddr_add $label_mac 2 > /sys${DEVPATH}/macaddress
+		;;
 	dlink,dap-x1860-a1)
 		hw_mac_addr="$(mtd_get_mac_binary factory 0x4)"
 		[ "$PHYNBR" = "0" ] && \
@@ -64,7 +71,8 @@ case "$board" in
 			macaddr_setbit_la "$base_mac" > /sys${DEVPATH}/macaddress
 		fi
 		;;
-	glinet,gl-mt1300)
+	glinet,gl-mt1300|\
+	z-router,zr-2660)
 		[ "$PHYNBR" = "1" ] && \
 			macaddr_add "$(mtd_get_mac_binary factory 0x4)" 1 > /sys${DEVPATH}/macaddress
 		;;
@@ -122,6 +130,11 @@ case "$board" in
 		[ "$PHYNBR" = "0" ] && macaddr_add $hw_mac_addr 1 > /sys${DEVPATH}/macaddress
 		[ "$PHYNBR" = "1" ] && macaddr_add $hw_mac_addr 2 > /sys${DEVPATH}/macaddress
 		;;
+	netgear,eax12)
+		hw_mac_addr=$(mtd_get_mac_ascii Config mac)
+		[ "$PHYNBR" = "0" ] && macaddr_add $hw_mac_addr 1 > /sys${DEVPATH}/macaddress
+		[ "$PHYNBR" = "1" ] && macaddr_add $hw_mac_addr 2 > /sys${DEVPATH}/macaddress
+		;;
 	netgear,wax202)
 		hw_mac_addr=$(mtd_get_mac_ascii Config mac)
 		[ "$PHYNBR" = "0" ] && macaddr_add $hw_mac_addr 2 > /sys${DEVPATH}/macaddress
@@ -167,7 +180,12 @@ case "$board" in
 		hw_mac_addr="$(mtd_get_mac_binary product-info 0x8)"
 		macaddr_add "$hw_mac_addr" "$PHYNBR" > "/sys${DEVPATH}/macaddress"
 		;;
-	yuncore,ax820)
+	tplink,ex220-v1)
+		hw_mac_addr="$(mtd_get_mac_binary rom_file 0xf100)"
+		[ "$PHYNBR" = "1" ] &&  macaddr_add "$hw_mac_addr" 2 > "/sys${DEVPATH}/macaddress"
+		;;
+	yuncore,ax820|\
+	yuncore,g720)
 		[ "$PHYNBR" = "1" ] && \
 			macaddr_setbit_la "$(mtd_get_mac_binary Factory 0xe000)" > /sys${DEVPATH}/macaddress
 		;;

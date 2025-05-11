@@ -38,7 +38,7 @@ function init_firewall() {
 	uci set firewall.@defaults[0].forward='ACCEPT'
 
 	case "$boardname" in
-	nanopi-r5s | nanopi-r2s | nanopi-r2)
+	nanopi-r5* | nanopi-r3* | nanopi-r2*)
 		uci set firewall.@defaults[0].flow_offloading='1'
 		;;
 	*)
@@ -73,7 +73,7 @@ function init_network() {
 	uci commit network
 }
 
-function init_nft-qos() {
+function init_nft_qos() {
 	uci set nft-qos.default=default
 	uci set nft-qos.default.limit_enable='0'
 	uci set nft-qos.default.limit_mac_enable='0'
@@ -197,20 +197,34 @@ function init_button() {
 }
 
 function clean_fstab() {
-	while uci -q del fstab.@mount[-1]; do true; done
+	# delete all entries but keep /opt
+	local index=0
+	while uci -q get fstab.@mount[$index]; do
+		local target=$(uci -q get fstab.@mount[$index].target)
+		if [ "$target" = "/opt" ]; then
+			index=$((index + 1))
+		else
+			uci -q del fstab.@mount[$index]
+			# do not increment index because the remaining entries will shift forward after deletion
+		fi
+	done
 	uci commit fstab
 }
 
 function update_ntp_server() {
 	local def_pool="openwrt.pool.ntp.org"
+	local ntps="$(uci -q get system.ntp.server)"
 
-	[ "$(uci -q get ntpclient.@ntpserver[0].hostname)" = "0.${def_pool}" ] && \
-		uci set ntpclient.@ntpserver[0].hostname="time.apple.com"
-	[ "$(uci -q get ntpclient.@ntpserver[1].hostname)" = "1.${def_pool}" ] && \
-		uci set ntpclient.@ntpserver[1].hostname="ntp.tencent.com"
-	[ "$(uci -q get ntpclient.@ntpserver[2].hostname)" = "2.${def_pool}" ] && \
-		uci set ntpclient.@ntpserver[2].hostname="time.cloudflare.com"
-	uci commit ntpclient
+	[ "${ntps}" = "${ntps#0\.${def_pool}}" ] && return 0
+
+	while uci -q del system.ntp.server; do true; done
+	uci -q batch <<-EOF
+		add_list system.ntp.server="time.apple.com"
+		add_list system.ntp.server="ntp.tencent.com"
+		add_list system.ntp.server="time.cloudflare.com"
+		add_list system.ntp.server="0.${def_pool}"
+		commit system.ntp
+	EOF
 }
 
 # ---------------------------------------------------------
@@ -232,9 +246,9 @@ function add_static_host() {
 
 HOSTNAME="FriendlyWrt"
 
-if [ "${1,,}" = "all" ]; then
+if [ "${1}" = "all" ]; then
 	init_network
-	init_nft-qos
+	init_nft_qos
 	init_firewall_ipv6
 	init_firewall
 	init_system

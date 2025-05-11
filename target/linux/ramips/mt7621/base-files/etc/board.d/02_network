@@ -26,6 +26,7 @@ ramips_setup_interfaces()
 	xiaomi,mi-router-cr6608|\
 	xiaomi,mi-router-cr6609|\
 	xiaomi,redmi-router-ac2100|\
+	z-router,zr-2660|\
 	zyxel,wsm20)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" "wan"
 		;;
@@ -41,6 +42,7 @@ ramips_setup_interfaces()
 	linksys,re7000|\
 	mikrotik,ltap-2hnd|\
 	mikrotik,routerboard-m11g|\
+	netgear,eax12|\
 	netgear,ex6150|\
 	sercomm,na502|\
 	sercomm,na502s|\
@@ -94,6 +96,9 @@ ramips_setup_interfaces()
 	zyxel,nr7101)
 		ucidef_set_interfaces_lan_wan "lan" "wan"
 		;;
+	dlink,covr-x1860-a1)
+		ucidef_set_interfaces_lan_wan "ethernet" "internet"
+		;;
 	gnubee,gb-pc1)
 		ucidef_set_interface_lan "ethblack ethblue"
 		;;
@@ -110,6 +115,9 @@ ramips_setup_interfaces()
 		;;
 	mikrotik,routerboard-760igs)
 		ucidef_set_interfaces_lan_wan "lan2 lan3 lan4 lan5" "wan sfp"
+		;;
+	mqmaker,witi)
+		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "wan1 wan2"
 		;;
 	tozed,zlt-s12-pro)
 		ucidef_set_interface_lan "lan1 lan2 lan3 wan"
@@ -208,6 +216,11 @@ ramips_setup_macs()
 		label_mac=$lan_mac
 		wan_mac=$(macaddr_add "$lan_mac" 1)
 		;;
+	dlink,covr-x1860-a1)
+		label_mac=$(mtd_get_mac_ascii config2 factory_mac)
+		wan_mac=$(macaddr_add "$label_mac" 3)
+		lan_mac=$label_mac
+		;;
 	dlink,dir-860l-b1)
 		lan_mac=$(mtd_get_mac_ascii factory lanmac)
 		wan_mac=$(mtd_get_mac_ascii factory wanmac)
@@ -288,6 +301,10 @@ ramips_setup_macs()
 		wan_mac=$(mtd_get_mac_encrypted_arcadyan "board_data")
 		label_mac=$wan_mac
 		lan_mac=$(macaddr_add "$wan_mac" 2)
+		;;
+	netgear,eax12)
+		lan_mac=$(mtd_get_mac_ascii Config mac)
+		label_mac=$lan_mac
 		;;
 	netgear,wax202)
 		lan_mac=$(mtd_get_mac_ascii Config mac)

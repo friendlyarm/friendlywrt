@@ -44,6 +44,9 @@ comfast,cf-wr800n)
 	ucidef_set_led_netdev "lan" "lan" "white:ethernet" eth0.1
 	ucidef_set_led_netdev "wifi_led" "wifi" "white:wifi" "wlan0"
 	;;
+dlink,dir-806a-b1)
+	ucidef_set_led_netdev "wifi_led" "2.4g" "green:wlan" "phy1-ap0"
+	;;
 dlink,dir-810l|\
 trendnet,tew-810dr)
 	ucidef_set_led_switch "wan" "wan" "green:wan" "switch0" "0x10"
@@ -97,6 +100,13 @@ domywifi,dw22d)
 		;;
 dovado,tiny-ac)
 	ucidef_set_led_netdev "wifi_led" "wifi" "orange:wifi" "wlan0"
+	;;
+edimax,br-6208ac-v2)
+	ucidef_set_led_netdev "wan" "Internet" "green:internet" "eth0.2" "tx rx"
+	ucidef_set_led_netdev "wifi_led" "WLAN 2.4 GHz" "green:wlan2g" "wlan1"
+	ucidef_set_led_netdev "wifi_led" "WLAN 5 GHz" "green:wlan5g" "wlan1"
+	ucidef_set_led_netdev "wifi_led" "Firmware" "green:firmware" "wlan1"
+	ucidef_set_led_netdev "lan" "VPN" "green:vpn" "switch0" "0x20"
 	;;
 edimax,br-6478ac-v2|\
 edimax,ew-7478apc)
@@ -197,6 +207,14 @@ zbtlink,zbt-we826-e)
 	;;
 ravpower,rp-wd03)
 	ucidef_set_led_netdev "internet" "internet" "green:wifi" "eth0"
+	;;
+rostelecom,rt-fl-1|\
+rostelecom,s1010)
+	ucidef_set_led_switch "lan-1" "lan-1" "green:lan-1" "switch0" "0x02"
+	ucidef_set_led_switch "lan-2" "lan-2" "green:lan-2" "switch0" "0x04"
+	ucidef_set_led_switch "lan-3" "lan-3" "green:lan-3" "switch0" "0x08"
+	ucidef_set_led_switch "lan-4" "lan-4" "green:lan-4" "switch0" "0x10"
+	ucidef_set_led_switch "wan" "wan" "green:wan" "switch0" "0x01"
 	;;
 tplink,archer-c2-v1)
 	ucidef_set_led_switch "lan" "lan" "green:lan" "switch1" "0x1e"

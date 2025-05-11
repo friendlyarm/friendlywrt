@@ -262,11 +262,6 @@ default_postinst() {
 
 	add_group_and_user "${pkgname}"
 
-	if [ -f "$root/usr/lib/opkg/info/${pkgname}.postinst-pkg" ]; then
-		( . "$root/usr/lib/opkg/info/${pkgname}.postinst-pkg" )
-		ret=$?
-	fi
-
 	if [ -d "$root/rootfs-overlay" ]; then
 		cp -R $root/rootfs-overlay/. $root/
 		rm -fR $root/rootfs-overlay/
@@ -290,6 +285,11 @@ default_postinst() {
 		fi
 
 		rm -f /tmp/luci-indexcache
+	fi
+
+	if [ -f "$root/usr/lib/opkg/info/${pkgname}.postinst-pkg" ]; then
+		( . "$root/usr/lib/opkg/info/${pkgname}.postinst-pkg" )
+		ret=$?
 	fi
 
 	local shell="$(command -v bash)"
@@ -371,7 +371,7 @@ group_add_next() {
 		return
 	fi
 	gids=$(cut -d: -f3 ${IPKG_INSTROOT}/etc/group)
-	gid=65536
+	gid=32768
 	while echo "$gids" | grep -q "^$gid$"; do
 		gid=$((gid + 1))
 	done
@@ -402,7 +402,7 @@ user_add() {
 	local rc
 	[ -z "$uid" ] && {
 		uids=$(cut -d: -f3 ${IPKG_INSTROOT}/etc/passwd)
-		uid=65536
+		uid=32768
 		while echo "$uids" | grep -q "^$uid$"; do
 			uid=$((uid + 1))
 		done

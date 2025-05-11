@@ -177,7 +177,7 @@ detect_mac80211() {
 				case "${driver}" in
 				"iwlwifi" | \
 				"mt7921e" | \
-				"rtw_8822ce")
+				"rtw_8822ce" | "rtl88x2ce")
 					pci_id=`cat $(readlink -f /sys/class/ieee80211/${dev}/device)/uevent | grep PCI_ID= | cut -d= -f 2`
 					product="pcie-${driver}-${pci_id}"
 					;;
@@ -232,9 +232,10 @@ detect_mac80211() {
 			country="set wireless.${name}.country='00'"
 			;;
 
-		# rtl88x2bu / rtl88x2cs
+		# rtl88x2bu / rtl88x2cs / rtl88x2ce
 		"bda/b82c/210" | \
-		"sdio-rtl88x2cs-024C:C822")
+		"sdio-rtl88x2cs-024C:C822" | \
+		"pcie-rtl88x2ce-10EC:C822")
 			mode_band='5g'
 			ht_capab="set wireless.${name}.htmode=VHT80"
 			rx_stbc="set wireless.${name}.rx_stbc='0'"
@@ -254,22 +255,13 @@ detect_mac80211() {
 
 		# mt7921 (pcie & usb)
 		"pcie-mt7921e-14C3:7961" | \
+		"pcie-mt7921e-14C3:0608" | \
 		"e8d/7961/100")
 			mode_band='5g'
 			ht_capab="set wireless.${name}.htmode=HE80"
 			channel=157
 			country="set wireless.${name}.country='CN'"
 			cell_density="set wireless.${name}.cell_density='0'"
-			;;
-
-		# mt7921 (pcie & usb)
-		"pcie-mt7921e-14C3:7961" | \
-		"e8d/7961/100")
-			mode_band='5g'
-			ht_capab="set wireless.radio${devidx}.htmode=HE80"
-			channel=157
-			country="set wireless.radio${devidx}.country='CN'"
-			cell_density="set wireless.radio${devidx}.cell_density='0'"
 			;;
 
 		# rtl8822ce
