@@ -14,6 +14,7 @@ nanopi-r2s)
 	;;
 nanopi-r2 | \
 nanopi-r3s| \
+nanopi-m5| \
 nanopi-r4s)
 	ucidef_set_led_netdev "wan" "WAN" "wan_led" "eth0"
 	ucidef_set_led_netdev "lan" "LAN" "lan_led" "eth1"
