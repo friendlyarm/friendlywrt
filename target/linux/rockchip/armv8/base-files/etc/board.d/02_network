@@ -13,6 +13,7 @@ rockchip_setup_interfaces()
 	nanopi-r4s | \
 	nanopi-r2 | \
 	nanopi-r5c | \
+	nanopi-r76s | \
 	nanopi-r6c | \
 	nanopc-t6 | \
 	nanopi-m5 | \
