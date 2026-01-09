@@ -1,0 +1,5 @@
+# Longcheer/Longsoon (aka Omega Technology) devices
+TargetVendor=0x1c9e
+TargetProductList="9000,9603,9605,9607,9900"
+MessageContent="555342431234567800000000000001ff000000000000000000000000000000"
+WaitBefore=1

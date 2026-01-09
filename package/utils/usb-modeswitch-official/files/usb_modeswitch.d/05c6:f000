@@ -1,0 +1,5 @@
+# Siptune LM-75 ("LinuxModem"), EWangshikong 4G
+TargetVendor=0x05c6
+TargetProductList="0016,6000,9000"
+StandardEject=1
+MessageContent="5553424308306384c000000080000671030000000000000000000000000000"

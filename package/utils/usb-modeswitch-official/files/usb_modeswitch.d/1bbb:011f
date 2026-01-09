@@ -1,0 +1,4 @@
+# Haier EVDO Rev. A
+TargetVendor=0x1bbb
+TargetProduct=0x0106
+StandardEject=1

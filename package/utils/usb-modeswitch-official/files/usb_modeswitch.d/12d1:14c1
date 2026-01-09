@@ -1,0 +1,4 @@
+# Vodafone (Huawei) K4605
+TargetVendor=0x12d1
+TargetProduct=0x14c6
+HuaweiNewMode=1

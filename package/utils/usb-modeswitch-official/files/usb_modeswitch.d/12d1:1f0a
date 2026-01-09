@@ -1,0 +1,4 @@
+# Vodafone/Huawei R218h (lkly compat. to E5573cs)
+TargetVendor=0x12d1
+TargetProduct=0x1c51
+HuaweiNewMode=1

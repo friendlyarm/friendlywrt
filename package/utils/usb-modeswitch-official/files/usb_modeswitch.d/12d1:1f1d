@@ -1,0 +1,4 @@
+# Vodafone / Huawei Kxxxx
+TargetVendor=0x12d1
+TargetProductList="157b,1591"
+HuaweiNewMode=1

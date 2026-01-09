@@ -1,0 +1,4 @@
+# Vodafone/Huawei K3771
+TargetVendor=0x12d1
+TargetProduct=0x14ca
+HuaweiNewMode=1

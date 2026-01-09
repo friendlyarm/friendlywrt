@@ -1,0 +1,4 @@
+# Quirky Option devices
+TargetVendor=0x0af0
+TargetProduct=0x6901
+OptionMode=1

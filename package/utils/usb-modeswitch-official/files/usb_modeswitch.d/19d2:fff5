@@ -1,0 +1,4 @@
+# ZTE "ff" devices 1
+TargetVendor=0x19d2
+TargetProductList="ffe4,ffe9,fff1,fffe,ffff"
+MessageContent="5553424312345678c00000008000069f030000000000000000000000000000"

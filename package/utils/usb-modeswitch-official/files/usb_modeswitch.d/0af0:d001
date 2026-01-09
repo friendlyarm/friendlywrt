@@ -1,0 +1,6 @@
+# Option GlobeTrotter GI1515
+TargetVendor=0x0af0
+TargetProductList="d157,d255,d257"
+OptionMode=1
+
+

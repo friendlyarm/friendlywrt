@@ -1,0 +1,4 @@
+# Olivetti Olicard 100 and others
+TargetVendor=0x0b3c
+TargetProductList="c000,c001,c002"
+StandardEject=1

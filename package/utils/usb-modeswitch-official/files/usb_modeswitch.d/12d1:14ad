@@ -1,0 +1,4 @@
+# Vodafone (Huawei) K3806
+TargetVendor=0x12d1
+TargetProduct=0x14ae
+HuaweiNewMode=1

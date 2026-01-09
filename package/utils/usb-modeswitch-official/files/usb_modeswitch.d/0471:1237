@@ -1,0 +1,4 @@
+# Philips TalkTalk (NXP Semiconductors "Dragonfly")
+TargetVendor=0x0471
+TargetProductList="1206,1234"
+StandardEject=1

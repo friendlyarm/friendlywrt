@@ -1,0 +1,4 @@
+# Vodafone (Huawei) K4511
+TargetVendor=0x12d1
+TargetProduct=0x14cc
+HuaweiNewMode=1

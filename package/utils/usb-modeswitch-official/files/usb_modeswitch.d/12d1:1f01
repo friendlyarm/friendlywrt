@@ -1,0 +1,6 @@
+# Huawei E353 (3.se) and others
+TargetVendor=0x12d1
+TargetProductList="14db,14dc"
+HuaweiNewMode=1
+
+

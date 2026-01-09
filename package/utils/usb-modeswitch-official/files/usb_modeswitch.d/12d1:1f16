@@ -1,0 +1,4 @@
+# Vodafone K5150
+TargetVendor=0x12d1
+TargetProductList="14f8,1575"
+HuaweiNewMode=1

@@ -1,0 +1,6 @@
+# Huawei/Vodafone R226
+TargetVendor=0x12d1
+TargetProduct=0x15bf
+HuaweiNewMode=1
+
+

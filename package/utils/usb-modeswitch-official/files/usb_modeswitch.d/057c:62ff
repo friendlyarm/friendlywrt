@@ -1,0 +1,7 @@
+# AVM Fritz!Wlan USB Sticks
+TargetVendor=0x057c
+TargetProductList="8501,8502,8602"
+# Std.Eject not working
+MessageContent="5553424312345678000000000000061b000000ff0000000000000000000000"
+
+

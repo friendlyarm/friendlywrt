@@ -1,0 +1,4 @@
+# Vodafone K4201
+TargetVendor=0x12d1
+TargetProduct=0x1576
+HuaweiNewMode=1

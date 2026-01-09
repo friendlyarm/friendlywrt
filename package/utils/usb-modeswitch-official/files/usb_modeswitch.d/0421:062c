@@ -1,0 +1,4 @@
+# Nokia CS-19
+TargetVendor=0x0421
+TargetProductList="062d,062f"
+StandardEject=1

@@ -1,0 +1,4 @@
+# Vodafone/Huawei K5160
+TargetVendor=0x12d1
+TargetProduct=0x1c28
+HuaweiNewMode=1

@@ -1,0 +1,6 @@
+# D-Link DWA-171 Wifi Dongle
+TargetVendor=0x2001
+TargetProduct=0x331d
+StandardEject=1
+
+

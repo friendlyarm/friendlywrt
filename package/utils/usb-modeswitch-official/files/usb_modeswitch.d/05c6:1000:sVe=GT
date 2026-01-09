@@ -1,0 +1,4 @@
+# Option GlobeTrotter GX0201
+TargetVendor=0x0af0
+TargetProduct=0x6701
+OptionMode=1

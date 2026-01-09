@@ -1,0 +1,4 @@
+# Axesstel MV210
+TargetVendor=0x1726
+TargetProduct=0x1000
+StandardEject=1

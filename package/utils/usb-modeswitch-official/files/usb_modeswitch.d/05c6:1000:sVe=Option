@@ -1,0 +1,4 @@
+# Older Option devices
+TargetVendor= 0x0af0
+TargetProductList="6901,6701,6600"
+OptionMode=1

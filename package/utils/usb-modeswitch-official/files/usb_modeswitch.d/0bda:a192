@@ -1,0 +1,6 @@
+# RTL8192FU Wifi Dongle
+TargetVendor=0x0bda
+TargetProduct=0xf192
+StandardEject=1
+
+

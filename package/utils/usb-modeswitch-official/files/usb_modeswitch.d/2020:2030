@@ -1,0 +1,5 @@
+# Telewell TW-LTE, Olicard 600, Digisol BG-BA4305
+TargetVendor=0x2020
+TargetProductList="2031,2033"
+StandardEject=1
+WaitBefore=2

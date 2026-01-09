@@ -1,0 +1,4 @@
+# Huawei E173u-2, E177
+TargetVendor=0x12d1
+TargetProduct=0x14d2
+HuaweiNewMode=1
