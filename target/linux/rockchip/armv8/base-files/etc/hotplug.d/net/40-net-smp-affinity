@@ -2,15 +2,24 @@
 
 [ "$ACTION" = add ] || exit
 
+# wait up to 6 seconds for the irq/device to appear
+case "$DEVICENAME" in
+eth[012] | wlan0)
+	seconds="4" ;;
+br-lan)
+	seconds="0" ;;
+*)
+	exit ;;
+esac
+
 get_device_irq() {
 	local device="$1"
 	local line
-	local seconds="0"
 
-	# wait up to 10 seconds for the irq/device to appear
-	while [ "${seconds}" -le 10 ]; do
+	while true; do
 		line=$(grep -E -m 1 "${device}\$" /proc/interrupts) && break
-		seconds="$(( seconds + 2 ))"
+		[ "${seconds}" -le 0 ] && break
+		seconds="$(( seconds - 2 ))"
 		sleep 2
 	done
 	echo ${line} | sed 's/:.*//'
@@ -24,8 +33,18 @@ set_interface_core() {
 	[ -z "${device}" ] && device="$interface"
 
 	local irq=$(get_device_irq "$device")
+	[ -z "$irq" ] && return 0
 
-	echo "${core_mask}" > /proc/irq/${irq}/smp_affinity
+	echo -n "${core_mask}" > /proc/irq/${irq}/smp_affinity
+}
+
+set_interface_rps() {
+	local core_mask="$1"
+	local interface="$2"
+
+	for d in /sys/class/net/${interface}/queues/rx-*; do
+		[ -d $d ] && echo "${core_mask}" > $d/rps_cpus
+	done
 }
 
 case "$(board_name)" in
@@ -39,6 +58,7 @@ sinovoip,rk3568-bpi-r2pro)
 	set_interface_core 2 "eth0"
 	set_interface_core 4 "eth1"
 	;;
+friendlyelec,nanopi-r2|\
 friendlyarm,nanopi-r2c|\
 friendlyarm,nanopi-r2c-plus|\
 friendlyarm,nanopi-r2s|\
@@ -46,8 +66,19 @@ radxa,cm3-io|\
 xunlong,orangepi-r1-plus|\
 xunlong,orangepi-r1-plus-lts)
 	set_interface_core 2 "eth0"
+	echo d > /sys/class/net/eth0/queues/rx-0/rps_cpus
 	set_interface_core 4 "eth1" "xhci-hcd:usb[0-9]+"
+	echo b > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	seconds="0"
+	set_interface_core 8 "wlan0" "36 Level     dw-mci"
 	;;
+friendlyelec,nanopi-r3s)
+	set_interface_core 4 "eth0"
+	echo b > /sys/class/net/eth0/queues/rx-0/rps_cpus
+	set_interface_core 2 "eth1"
+	echo d > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	;;
+friendlyelec,nanopi-r4s|\
 friendlyarm,nanopi-r4s|\
 friendlyarm,nanopi-r4s-enterprise|\
 friendlyarm,nanopi-r6c|\
@@ -56,7 +87,75 @@ friendlyarm,nanopc-t6|\
 radxa,rock-5-itx|\
 radxa,rock-5t)
 	set_interface_core 10 "eth0"
+	echo 3f > /sys/class/net/eth0/queues/rx-0/rps_cpus
 	set_interface_core 20 "eth1"
+	echo 3f > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	;;
+friendlyelec,nanopi-r5c)
+	set_interface_core 2 "eth0-0"
+	set_interface_core 2 "eth0-16"
+	set_interface_core 2 "eth0-18"
+	echo d > /sys/class/net/eth0/queues/rx-0/rps_cpus
+	set_interface_core 4 "eth1-0"
+	set_interface_core 4 "eth1-16"
+	set_interface_core 4 "eth1-18"
+	echo b > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	;;
+friendlyelec,nanopi-r5s)
+	set_interface_core 8 "eth0"
+	echo f > /sys/class/net/eth0/queues/rx-0/rps_cpus
+	set_interface_core 4 "eth1-0"
+	set_interface_core 4 "eth1-16"
+	set_interface_core 4 "eth1-18"
+	echo b > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	set_interface_core 2 "eth2-0"
+	set_interface_core 2 "eth2-16"
+	set_interface_core 2 "eth2-18"
+	echo d > /sys/class/net/eth2/queues/rx-0/rps_cpus
+	;;
+friendlyelec,nanopi-r6c)
+	set_interface_core 2 "eth0"
+	echo fe > /sys/class/net/eth0/queues/rx-0/rps_cpus
+	set_interface_core 4 "eth1-0"
+	set_interface_core 4 "eth1-16"
+	set_interface_core 4 "eth1-18"
+	echo fe > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	seconds="0"
+	set_interface_core 40 "xhci-hcd:usb3"
+	set_interface_rps "fe" "wlan0"
+	;;
+friendlyelec,nanopi-r6s)
+	set_interface_core 2 "eth0"
+	echo fe > /sys/class/net/eth0/queues/rx-0/rps_cpus
+	set_interface_core 4 "eth1-0"
+	set_interface_core 4 "eth1-16"
+	set_interface_core 4 "eth1-18"
+	echo fe > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	set_interface_core 8 "eth2-0"
+	set_interface_core 8 "eth2-16"
+	set_interface_core 8 "eth2-18"
+	echo fe > /sys/class/net/eth2/queues/rx-0/rps_cpus
+	seconds="0"
+	set_interface_core 40 "xhci-hcd:usb3"
+	set_interface_rps "fe" "wlan0"
+	;;
+friendlyelec,nanopc-t6)
+	set_interface_core 8 "eth0-0"
+	set_interface_core 8 "eth0-16"
+	set_interface_core 8 "eth0-18"
+	echo fe > /sys/class/net/eth0/queues/rx-0/rps_cpus
+	set_interface_core 4 "eth1-0"
+	set_interface_core 4 "eth1-16"
+	set_interface_core 4 "eth1-18"
+	echo fe > /sys/class/net/eth1/queues/rx-0/rps_cpus
+	seconds="0"
+	set_interface_core 40 "xhci-hcd:usb5"
+	set_interface_core 40 "xhci-hcd:usb7"
+	set_interface_rps "fe" "wlan0"
+	;;
+friendlyelec,nanopi-r76s)
+	echo fe > /sys/class/net/eth0/queues/rx-0/rps_cpus
+	echo fe > /sys/class/net/eth1/queues/rx-0/rps_cpus
 	;;
 friendlyarm,nanopi-r5s)
 	set_interface_core 2 "eth0"
