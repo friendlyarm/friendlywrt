@@ -1,0 +1,30 @@
+From d4a41f11ab321918d122934feac90ca45d5220b5 Mon Sep 17 00:00:00 2001
+From: hmz007 <hmz007@gmail.com>
+Date: Fri, 9 Jan 2026 14:41:19 +0800
+Subject: [PATCH] drivers: set SCMI_CLOCK_NAME_LENGTH_MAX to 18
+
+This fixes following error:
+  initializer-string for array of 'char' truncates NUL terminator
+  but destination lacks 'nonstring' attribute (17 chars into 16 available)
+
+Signed-off-by: hmz007 <hmz007@gmail.com>
+---
+ drivers/scmi-msg/clock.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/scmi-msg/clock.h b/drivers/scmi-msg/clock.h
+index a637934ee..34d067dde 100644
+--- a/drivers/scmi-msg/clock.h
++++ b/drivers/scmi-msg/clock.h
+@@ -36,7 +36,7 @@ struct scmi_clock_attributes_a2p {
+ 	uint32_t clock_id;
+ };
+ 
+-#define SCMI_CLOCK_NAME_LENGTH_MAX	16U
++#define SCMI_CLOCK_NAME_LENGTH_MAX	18U
+ 
+ struct scmi_clock_attributes_p2a {
+ 	int32_t status;
+-- 
+2.52.0
+
