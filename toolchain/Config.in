@@ -298,6 +298,7 @@ choice
 
 endchoice
 
+source "toolchain/glibc/Config.in"
 source "toolchain/musl/Config.in"
 
 comment "Debuggers"

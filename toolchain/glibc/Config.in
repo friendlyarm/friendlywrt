@@ -1,0 +1,9 @@
+# Set minimum kernel version
+
+config GLIBC_MIN_KERNEL_VERSION
+	string
+	prompt "Minimum kernel version to support" if TOOLCHAINOPTS
+	depends on USE_GLIBC && !EXTERNAL_TOOLCHAIN
+	default "6.6.0"
+	help
+	  Enter here the lowest kernel version glibc will be able to run against.

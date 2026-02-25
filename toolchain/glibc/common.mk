@@ -69,7 +69,7 @@ GLIBC_CONFIGURE:= \
 		  $(if $(CONFIG_PKG_FORTIFY_SOURCE_1),--enable-fortify-source=1) \
 		  $(if $(CONFIG_PKG_FORTIFY_SOURCE_2),--enable-fortify-source=2) \
 		  $(if $(CONFIG_PKG_FORTIFY_SOURCE_3),--enable-fortify-source=3) \
-		--enable-kernel=6.6.0
+		--enable-kernel=$(CONFIG_GLIBC_MIN_KERNEL_VERSION)
 
 export libc_cv_ssp=no
 export libc_cv_ssp_strong=no
