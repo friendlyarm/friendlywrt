@@ -36,7 +36,7 @@ index 48b2440..96f1af4 100644
  	option output		ACCEPT
  	option forward		DROP
 +	option fullcone4	1
-+	option fullcone6	1
++	option fullcone6	0
  	option masq		1
  	option mtu_fix		1
  
