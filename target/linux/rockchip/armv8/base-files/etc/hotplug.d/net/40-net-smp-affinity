@@ -153,7 +153,8 @@ friendlyelec,nanopc-t6)
 	set_interface_core 40 "xhci-hcd:usb7"
 	set_interface_rps "fe" "wlan0"
 	;;
-friendlyelec,nanopi-r76s)
+friendlyelec,nanopi-r76s|\
+friendlyelec,nanopi-m5)
 	echo fe > /sys/class/net/eth0/queues/rx-0/rps_cpus
 	echo fe > /sys/class/net/eth1/queues/rx-0/rps_cpus
 	;;

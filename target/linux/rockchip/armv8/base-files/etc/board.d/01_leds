@@ -56,6 +56,7 @@ radxa,e52c)
 friendlyelec,nanopi-r2|\
 friendlyelec,nanopi-r3s|\
 friendlyelec,nanopi-r76s|\
+friendlyelec,nanopi-m5|\
 friendlyelec,nanopi-r4s)
 	ucidef_set_led_netdev "wan" "WAN" "wan_led" "eth0"
 	ucidef_set_led_netdev "lan" "LAN" "lan_led" "eth1"
