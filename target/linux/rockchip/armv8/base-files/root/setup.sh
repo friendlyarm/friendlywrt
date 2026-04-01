@@ -3,6 +3,10 @@
 # ---------------------------------------------------------
 # put to /etc/uci-defaults/
 # see default_postinst() in lib/functions.sh
+. /lib/functions/uci-defaults.sh
+. /lib/functions/system.sh
+board=$(board_name)
+boardname="${board##*,}"
 
 function init_firewall_ipv6() {
 	local rule_en='1'
@@ -29,13 +33,37 @@ function init_firewall_ipv6() {
 }
 
 function init_firewall() {
-	zone_name=$(uci -q get firewall.@zone[1].name)
-	[ "$zone_name" = "wan" ] || return 0
+	uci set firewall.@defaults[0].input='ACCEPT'
+	uci set firewall.@defaults[0].output='ACCEPT'
+	uci set firewall.@defaults[0].forward='ACCEPT'
 
-	uci set firewall.@defaults[0].flow_offloading='0'
-	uci set firewall.@zone[1].input='ACCEPT'
-	uci set firewall.@zone[1].output='ACCEPT'
-	uci set firewall.@zone[1].forward='ACCEPT'
+	case "$boardname" in
+	nanopi-r5* | nanopi-r3* | nanopi-r2*)
+		uci set firewall.@defaults[0].flow_offloading='1'
+		;;
+	*)
+		uci set firewall.@defaults[0].flow_offloading='0'
+		;;
+	esac
+
+	uci set firewall.@defaults[0].fullcone='0'
+
+	zone_name=$(uci -q get firewall.@zone[1].name)
+	if [ "$zone_name" = "wan" ]; then
+		INTERFACES=$(ip address | grep ^[0-9] | awk -F: '{print $2}' | sed "s/ //g" | grep '^[e]' | grep -v "@" | grep -v "\.")
+		IFCOUNT=$(echo "${INTERFACES}" | wc -l)
+		if [ ${IFCOUNT} -eq 1 ]; then
+			# INSECURE!!! only for single-port device
+			uci set firewall.@zone[1].input='ACCEPT'
+			uci set firewall.@zone[1].output='ACCEPT'
+			uci set firewall.@zone[1].forward='ACCEPT'
+		else
+			uci set firewall.@zone[1].input='REJECT'
+			uci set firewall.@zone[1].output='ACCEPT'
+			uci set firewall.@zone[1].forward='REJECT'
+		fi
+	fi
+
 	uci commit firewall
 	fw4 reload
 }
@@ -43,14 +71,6 @@ function init_firewall() {
 function init_network() {
 	uci set network.globals.ula_prefix='fd00:ab:cd::/48'
 	uci commit network
-}
-
-function init_nft_qos() {
-	uci set nft-qos.default=default
-	uci set nft-qos.default.limit_enable='0'
-	uci set nft-qos.default.limit_mac_enable='0'
-	uci set nft-qos.default.priority_enable='0'
-	uci commit nft-qos
 }
 
 function disable_ipv6() {
@@ -69,9 +89,13 @@ function disable_ipv6() {
 }
 
 function init_system() {
+	[ -e /usr/bin/ip ] || ln -sf /sbin/ip /usr/bin/ip
+	[ -e /etc/crontabs/root ] || touch /etc/crontabs/root
 	uci -q batch <<-EOF
 		set system.@system[-1].hostname='$HOSTNAME'
 		set system.@system[-1].ttylogin='1'
+		set system.@system[-1].timezone=CST-8
+		set system.@system[-1].zonename=Asia/Shanghai
 		commit system
 	EOF
 }
@@ -124,6 +148,31 @@ function init_theme() {
 	fi
 }
 
+function init_docker() {
+    if [ -f /etc/config/dockerd ]; then
+		sed -i '/option alt_config_file/d' /etc/config/dockerd
+		uci set dockerd.globals.alt_config_file='/etc/docker/daemon.json'
+		uci set dockerd.globals.data_root='/opt/docker/'
+		uci set dockerd.globals.log_level='warn'
+		uci set dockerd.globals.iptables='1'
+		uci set dockerd.proxies=proxies
+		uci set dockerd.firewall=firewall
+		uci set dockerd.firewall.device='docker0'
+		uci set dockerd.firewall.blocked_interfaces='wan'
+		uci commit dockerd
+
+		mkdir -p /etc/docker
+		cat <<EOF > /etc/docker/daemon.json
+{
+  "ip6tables": false,
+  "dns": ["8.8.8.8", "8.8.4.4"],
+  "data-root": "/opt/docker/"
+}
+EOF
+
+    fi
+}
+
 function init_root_home() {
 	chmod 0700 /root
 	mkdir -m 0700 -p /root/.ssh
@@ -154,7 +203,17 @@ function init_button() {
 }
 
 function clean_fstab() {
-	while uci -q del fstab.@mount[-1]; do true; done
+	# delete all entries but keep /opt
+	local index=0
+	while uci -q get fstab.@mount[$index]; do
+		local target=$(uci -q get fstab.@mount[$index].target)
+		if [ "$target" = "/opt" ]; then
+			index=$((index + 1))
+		else
+			uci -q del fstab.@mount[$index]
+			# do not increment index because the remaining entries will shift forward after deletion
+		fi
+	done
 	uci commit fstab
 }
 
@@ -195,7 +254,6 @@ HOSTNAME="FriendlyWrt"
 
 if [ "${1}" = "all" ]; then
 	init_network
-	init_nft_qos
 	init_firewall_ipv6
 	init_firewall
 	init_system
@@ -205,6 +263,7 @@ if [ "${1}" = "all" ]; then
 	init_watchcat
 	init_openssh
 	init_theme
+	init_docker
 	init_root_home
 	init_root_vimrc
 	init_button
