@@ -76,7 +76,10 @@ mediatek_setup_interfaces()
 	wavlink,wl-wn536ax6-a|\
 	zbtlink,zbt-z8102ax|\
 	zbtlink,zbt-z8102ax-v2)
-		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" eth1
+		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "eth1"
+		;;
+	zbtlink,zbt-z8106ax-t)
+		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "eth1 wwan"
 		;;
 	asiarf,ap7986-003|\
 	asus,tuf-ax4200q|\
@@ -110,6 +113,8 @@ mediatek_setup_interfaces()
 	cudy,ap3000-v1|\
 	cudy,re3000-v1|\
 	kebidumei,ax3000-u22|\
+	keenetic,kap-630|\
+	netcraze,nap-630|\
 	netgear,eax17|\
 	netgear,wax220|\
 	openfi,6c|\
@@ -123,7 +128,8 @@ mediatek_setup_interfaces()
 	bananapi,bpi-r3-mini|\
 	edgecore,eap111|\
 	huasifei,wh3000|\
-	huasifei,wh3000-pro)
+	huasifei,wh3000-pro-emmc|\
+	huasifei,wh3000-pro-nand)
 		ucidef_set_interfaces_lan_wan eth0 eth1
 		;;
 	bazis,ax3000wm|\
@@ -140,6 +146,9 @@ mediatek_setup_interfaces()
 	openembed,som7981|\
 	openwrt,one)
 		ucidef_set_interfaces_lan_wan eth1 eth0
+		;;
+	dlink,aquila-pro-ai-e30-a1)
+		ucidef_set_interface_lan "lan"
 		;;
 	dlink,aquila-pro-ai-m30-a1|\
 	dlink,aquila-pro-ai-m60-a1)
@@ -201,6 +210,9 @@ mediatek_setup_interfaces()
 	xiaomi,redmi-router-ax6000-stock|\
 	xiaomi,redmi-router-ax6000-ubootmod)
 		ucidef_set_interfaces_lan_wan "lan2 lan3 lan4" wan
+		;;
+	zyxel,wx5600-t0-ubootmod)
+		ucidef_set_interface_lan "lan1 lan2"
 		;;
 	*)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" wan
