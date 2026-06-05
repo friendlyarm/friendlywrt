@@ -6,10 +6,10 @@ PKG_RELEASE=1
 
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 
-PKG_SOURCE_VERSION:=2.6.2
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
-PKG_HASH:=f7abd337784a9d1bd39cb8a587518aff6f2a43d916145eafd80b1b8b7146db66
-PKG_SOURCE_URL:=http://www.draisberghof.de/usb_modeswitch/
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/friendlyarm/usb-modeswitch.git
+PKG_SOURCE_VERSION:=v2.6.2
+PKG_MIRROR_HASH:=skip
 #CMAKE_INSTALL:=1
 
 PKG_LICENSE:=GPLv2
@@ -20,7 +20,10 @@ PKG_MAINTAINER:=Robin He <robin@focalcrest.org>
 PKG_DATA_VERSION:=20191128
 PKG_DATA_PATH:=usb-modeswitch-data-$(PKG_DATA_VERSION)
 PKG_DATA_FILENAME:=$(PKG_DATA_PATH).tar.bz2
-PKG_DATA_URL:=http://www.draisberghof.de/usb_modeswitch
+PKG_DATA_URL:= \
+	http://www.draisberghof.de/usb_modeswitch \
+	https://sources.openwrt.org \
+	https://sources.cdn.openwrt.org
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -41,7 +44,6 @@ endef
 define Build/Prepare
 	$(Build/Prepare/Default)
 	tar xvfj $(DL_DIR)/$(PKG_DATA_FILENAME) -C $(PKG_BUILD_DIR)
-	tar xvfj $(DL_DIR)/$(PKG_SOURCE) -C $(BUILD_DIR)
 endef
 
 define Package/usb-modeswitch-official/install
