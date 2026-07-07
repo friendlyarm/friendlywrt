@@ -8,6 +8,20 @@
 board=$(board_name)
 boardname="${board##*,}"
 
+function init_theme() {
+	if [ "$PKG_UPGRADE" = 1 ]; then
+		return 0
+	fi
+
+	if uci get luci.themes.Argon >/dev/null 2>&1; then
+		uci set luci.main.mediaurlbase='/luci-static/argon'
+		uci commit luci
+	elif uci get luci.themes.Bootstrap >/dev/null 2>&1; then
+		uci set luci.main.mediaurlbase='/luci-static/bootstrap'
+		uci commit luci
+	fi
+}
+
 function init_firewall_ipv6() {
 	local rule_en='1'
 	local wan6=$(uci -q get network.wan.ipv6)
@@ -136,16 +150,6 @@ function init_openssh() {
 	sed "s/^#PermitRootLogin.*/PermitRootLogin yes/g" $conf -i.orig
 	sed "s/^#\s*Banner/Banner/g" $conf -i
 	/etc/init.d/sshd reload
-}
-
-function init_theme() {
-	if [ "$PKG_UPGRADE" != 1 ]; then
-		uci get luci.themes.Bootstrap >/dev/null 2>&1 && \
-		uci batch <<-EOF
-			set luci.main.mediaurlbase=/luci-static/bootstrap
-			commit luci
-		EOF
-	fi
 }
 
 function init_docker() {
