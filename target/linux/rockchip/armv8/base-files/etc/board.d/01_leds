@@ -54,6 +54,7 @@ radxa,e52c)
 	ucidef_set_led_netdev "lan" "LAN" "green:lan" "lan"
 	;;
 friendlyelec,nanopi-r2|\
+friendlyelec,nanopi-r28s|\
 friendlyelec,nanopi-r3s|\
 friendlyelec,nanopi-r76s|\
 friendlyelec,nanopi-m5|\
