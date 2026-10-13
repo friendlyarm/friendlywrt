@@ -54,13 +54,16 @@ radxa,e52c)
 	ucidef_set_led_netdev "lan" "LAN" "green:lan" "lan"
 	;;
 friendlyelec,nanopi-r2|\
-friendlyelec,nanopi-r28s|\
 friendlyelec,nanopi-r3s|\
 friendlyelec,nanopi-r76s|\
 friendlyelec,nanopi-m5|\
 friendlyelec,nanopi-r4s)
 	ucidef_set_led_netdev "wan" "WAN" "wan_led" "eth0"
 	ucidef_set_led_netdev "lan" "LAN" "lan_led" "eth1"
+	;;
+friendlyelec,nanopi-r28s)
+    ucidef_set_led_netdev "wan" "WAN" "led1" "eth0"
+    ucidef_set_led_netdev "lan" "LAN" "led2" "eth1"
 	;;
 friendlyelec,nanopi-r5c)
 	ucidef_set_led_netdev "wan" "WAN" "wan_led" "eth0" "link"
